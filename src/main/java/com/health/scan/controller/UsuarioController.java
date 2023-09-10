@@ -15,13 +15,25 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @RequestMapping(value = "usuario/enviar-email-recuperacao", method =  RequestMethod.POST)
+    public ObjectResponse enviarEmailRecuperacao(@RequestBody Usuario usuario)
+    {
+        return usuarioService.enviarEmailRecuperacao(usuario);
+    }
+
+    @RequestMapping(value = "usuario/reenviar-email-validacao", method =  RequestMethod.POST)
+    public ObjectResponse reenviarEmailValidacao(@RequestBody Usuario usuario)
+    {
+        return usuarioService.reenviarEmailValidacao(usuario);
+    }
+
     @RequestMapping(value = "usuario/logar", method =  RequestMethod.POST)
     public ObjectResponse post(@RequestBody Usuario usuario)
     {
         return usuarioService.logar(usuario);
     }
 
-    @RequestMapping(value = "/logar-token", method =  RequestMethod.POST)
+    @RequestMapping(value = "usuario/logar-token", method =  RequestMethod.POST)
     public ObjectResponse postToken(@Validated @RequestBody Usuario usuario)
     {
         return usuarioService.logarToken(usuario);
@@ -37,5 +49,11 @@ public class UsuarioController {
     public ObjectResponse validarCodigo(@RequestBody Usuario usuario)
     {
         return usuarioService.validarCodigo(usuario);
+    }
+
+    @RequestMapping(value = "usuario/cadastrar-nova-senha", method =  RequestMethod.POST)
+    public ObjectResponse cadastrarNovaSenha(@RequestBody Usuario usuario)
+    {
+        return usuarioService.cadastrarNovaSenha(usuario);
     }
 }
