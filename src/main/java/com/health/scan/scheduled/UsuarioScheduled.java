@@ -11,7 +11,7 @@ public class UsuarioScheduled {
 
 
     private final long SEGUNDO = 1000;
-    private final long MINUTO = SEGUNDO * 15;
+    private final long MINUTO = SEGUNDO * 3600;
 
     public void expirarCodigo(Usuario usr, IUsuarioRepository repository) {
         Timer timer = new Timer();

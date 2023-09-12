@@ -5,14 +5,16 @@ import com.health.scan.entity.response.ObjectResponse;
 import com.health.scan.repository.IUsuarioRepository;
 import com.health.scan.scheduled.UsuarioScheduled;
 import com.health.scan.util.email.EmailSend;
+import com.health.scan.util.file.FileUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class UsuarioService{
@@ -107,9 +109,10 @@ public class UsuarioService{
             return response;
         }
 
-        usuario = gerarCodigo(usr, "Health Scan - Codigo de verificação", "Seu código de verificação para o aplicativo HealthScan é: ");
-        usuario.setSenha("");
+        String html = gerarHtmlEmailValidacao(usr);
+        usuario = gerarCodigo(usr, "Health Scan - Codigo de verificação", html);
 
+        usuario.setSenha("");
         response.setResult(usuario);
 
         return response;
@@ -148,12 +151,13 @@ public class UsuarioService{
         int min = 10000;
         int intervalo = max - min + 1;
         String validator = String.valueOf((int)(Math.random() * intervalo) + min);
+        mensagem = mensagem.replace("id:codigo", validator);
 
         usr.setValidator(validator);
         usr.setStatus("0");
 
         EmailSend emailSend = new EmailSend();
-        emailSend.send(usr.getEmail(), titulo, mensagem+usr.getValidator());
+        emailSend.sendHtml(usr.getEmail(), titulo, mensagem);
 
         UsuarioScheduled usuarioScheduled = new UsuarioScheduled();
         usuarioScheduled.expirarCodigo(usr, repository);
@@ -173,7 +177,9 @@ public class UsuarioService{
             return response;
         }
 
-        usuario = gerarCodigo(usuario, "Health Scan - Recuperação de senha", "Seu Código para recuperação de senha é: ");
+        String html = gerarHtmlEmailRecuperacao(usuario);
+
+        usuario = gerarCodigo(usuario, "Health Scan - Codigo de recuperação", html);
         usuario.setSenha("");
         response.setResult(usuario);
 
@@ -191,13 +197,58 @@ public class UsuarioService{
             response.setMessage("email-nao-existe");
             return response;
         }
+        String html = gerarHtmlEmailValidacao(usuario);
 
-        usuario = gerarCodigo(usuario, "Health Scan - Codigo de verificação", "Seu código de verificação para o aplicativo HealthScan é: ");
+        usuario = gerarCodigo(usuario, "Health Scan - Codigo de verificação", html);
         usuario.setSenha("");
         response.setResult(usuario);
 
         return response;
     }
+    private String gerarHtmlEmailRecuperacao(Usuario usuario) {
+        String html = "";
+        try {
+            FileUtil fileUtil = new FileUtil();
+            String imagemModeloEscuro = fileUtil.toBase64("./modelos/email-recuperacao/assets/modelo_escuro.png", "image/png");
+            String imagemModeloEscuroLogo = fileUtil.toBase64("./modelos/email-recuperacao/assets/modelo_escuro_logo.png", "image/png");
+
+            html = lerArquivo("./modelos/email-recuperacao/index.html");
+
+            html = html.replace("id:modelo-escuro", imagemModeloEscuro);
+            html = html.replace("id:modelo-logo-escuro", imagemModeloEscuroLogo);
+            html = html.replace("id:nome-usuario", usuario.getLogin());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return html;
+    }
+    private String gerarHtmlEmailValidacao(Usuario usuario) {
+        String html = "";
+        html = lerArquivo("./modelos/email-validacao/index.html");
+        html = html.replace("id:nome-usuario", usuario.getLogin());
+
+        return html;
+    }
+
+    private String lerArquivo(String path){
+        StringBuilder html = new StringBuilder("");
+        try {
+            FileReader arq = new FileReader(path);
+            BufferedReader lerArq = new BufferedReader(arq);
+
+            String linha = "";
+            while (linha != null) {
+                linha = lerArq.readLine();
+                html.append(linha);
+            }
+            arq.close();
+        } catch (IOException e) {
+            System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
+        }
+        return html.toString();
+    }
+
     private Usuario gerarToken(Usuario usuario){
         UUID token = UUID.randomUUID();
         String uutoken = token.toString();
