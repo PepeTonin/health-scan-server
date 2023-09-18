@@ -1,0 +1,2 @@
+ALTER TABLE comparacao
+ADD NOME VARCHAR(255);

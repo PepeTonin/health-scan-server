@@ -1,0 +1,2 @@
+ALTER TABLE produto_pesquisado
+ADD IDUSUARIO INT;
