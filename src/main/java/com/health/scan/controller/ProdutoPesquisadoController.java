@@ -1,5 +1,6 @@
 package com.health.scan.controller;
 
+import com.health.scan.entity.ProdutoPesquisado;
 import com.health.scan.entity.response.ObjectResponse;
 import com.health.scan.service.ProdutoPesquisadoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,5 +15,11 @@ public class ProdutoPesquisadoController {
     public ObjectResponse buscarUltimosProdutos(@RequestParam String idUsuario)
     {
         return service.buscarUltimosProdutos(Long.valueOf(idUsuario));
+    }
+
+    @RequestMapping(value = "produto-pesquisado/save", method =  RequestMethod.POST)
+    public ObjectResponse save(@RequestBody ProdutoPesquisado produtoPesquisado)
+    {
+        return service.save(produtoPesquisado);
     }
 }

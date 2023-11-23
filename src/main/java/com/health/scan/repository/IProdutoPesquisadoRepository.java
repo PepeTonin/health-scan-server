@@ -11,7 +11,8 @@ import com.health.scan.entity.ProdutoPesquisado;
 public interface IProdutoPesquisadoRepository extends JpaRepository<ProdutoPesquisado, Long> {
 
     @Query("SELECT pp FROM ProdutoPesquisado pp "
-            + "INNER JOIN FETCH pp.produto p "
+            + "LEFT JOIN FETCH pp.produto p "
+            + "INNER JOIN FETCH pp.usuario u "
             + "WHERE pp.usuario.id = :idUsuario "
             + "ORDER BY pp.dataHoraInc DESC")
     Page<ProdutoPesquisado> buscarUltimosProdutos(@Param("idUsuario") Long idUsuario, Pageable pageable);

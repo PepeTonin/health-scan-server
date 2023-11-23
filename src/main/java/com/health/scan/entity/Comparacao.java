@@ -1,36 +1,30 @@
 package com.health.scan.entity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
-@Table(name = "PRODUTO_PESQUISADO")
-public class ProdutoPesquisado implements Serializable {
+@Table(name = "COMPARACAO")
+public class Comparacao implements Serializable {
 
-    private static final long serialVersionUID = -2420346134960559062L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDPRODUTOPESQUISADO")
+    @Column(name = "IDCOMPARACAO")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPRODUTO")
-    private Produto produto;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IDUSUARIO")
     private Usuario usuario;
 
-    @Column(name = "DESCRICAO_PRODUTO")
-    private String descricaoProduto;
-
-    @Column(name = "IMAGEM_PRODUTO")
-    private String imagemProduto;
-
-    @Column(name = "COD_BARRA")
-    private String codBarra;
+    @Column(name = "NOME")
+    private String nome;
 
     @Column(name = "DATAHORAINC")
     private Timestamp dataHoraInc;
@@ -41,20 +35,16 @@ public class ProdutoPesquisado implements Serializable {
     @Column(name = "DATAHORADEL")
     private Timestamp dataHoraDel;
 
+    @Transient
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<ProdutoComparado> produtoComparadoList;
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
     }
 
     public Usuario getUsuario() {
@@ -89,27 +79,19 @@ public class ProdutoPesquisado implements Serializable {
         this.dataHoraDel = dataHoraDel;
     }
 
-    public String getDescricaoProduto() {
-        return descricaoProduto;
+    public String getNome() {
+        return nome;
     }
 
-    public void setDescricaoProduto(String descricaoProduto) {
-        this.descricaoProduto = descricaoProduto;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public String getImagemProduto() {
-        return imagemProduto;
+    public List<ProdutoComparado> getProdutoComparadoList() {
+        return produtoComparadoList;
     }
 
-    public void setImagemProduto(String imagemProduto) {
-        this.imagemProduto = imagemProduto;
-    }
-
-    public String getCodBarra() {
-        return codBarra;
-    }
-
-    public void setCodBarra(String codBarra) {
-        this.codBarra = codBarra;
+    public void setProdutoComparadoList(List<ProdutoComparado> produtoComparadoList) {
+        this.produtoComparadoList = produtoComparadoList;
     }
 }
